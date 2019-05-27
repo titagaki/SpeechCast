@@ -47,7 +47,6 @@ namespace SpeechCast
                         }
                         break;
                     }
-                case Response.BBSStyle.yykakiko:
                 case Response.BBSStyle.nichan:
                     {
                         Match m = nichanRegex.Match(rawText);

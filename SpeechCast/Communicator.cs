@@ -10,13 +10,11 @@ namespace SpeechCast
 {
     class Communicator
     {
-        public static Regex JBBSRegex = new System.Text.RegularExpressions.Regex(@"(http://jbbs.livedoor.jp|http://jbbs.shitaraba.net)/bbs/read.cgi(/(\w+)/(\d+)/(\d+)/)");
-        public static Regex YYRegex = new System.Text.RegularExpressions.Regex(@"(http://yy.+\..+|http://bbs\.aristocratism\.info|http://www.+\.atchs\.jp)/.+/read.cgi/(\w+)/(\d+)/");
-        public static Regex NichanRegex = new System.Text.RegularExpressions.Regex(@"(http://.+2ch\.net)/.+/read.cgi/(\w+)/(\d+)/");
+        public static Regex JBBSRegex = new System.Text.RegularExpressions.Regex(@"(?<baseURL>https?://jbbs\.(livedoor\.jp|shitaraba\.net))/bbs/read.cgi(?<pathinfo>/(?<category>\w+)/(?<board>\d+)/(?<thread>\d+)/)");
+        public static Regex NichanRegex = new System.Text.RegularExpressions.Regex(@"(?<baseURL>http://.+\.[25]ch\.net)/.+/read.cgi/(?<board>\w+)/(?<thread>\d+)/");
 
-        public static Regex JBBSBaseRegex = new System.Text.RegularExpressions.Regex(@"(http://jbbs.livedoor.jp|http://jbbs.shitaraba.net)/(\w+)/(\d+)/");
-        public static Regex YYBaseRegex = new System.Text.RegularExpressions.Regex(@"(http://yy.+\..+|http://bbs\.aristocratism\.info|http://www.+\.atchs\.jp)/(\w+)/");
-        public static Regex NichanBaseRegex = new System.Text.RegularExpressions.Regex(@"(http://.+2ch\.net)/(\w+)/");
+        public static Regex JBBSBaseRegex = new System.Text.RegularExpressions.Regex(@"(?<baseURL>https?://jbbs\.(livedoor\.jp|shitaraba\.net))/(?<category>\w+)/(?<board>\d+)/");
+        public static Regex NichanBaseRegex = new System.Text.RegularExpressions.Regex(@"(?<baseURL>https?://.+\.[25]ch\.net)/(?<board>\w+)/");
 
         public static Regex htmlBodyRegex = new System.Text.RegularExpressions.Regex("<body.*?>(.*)</body>", RegexOptions.IgnoreCase);
 
@@ -35,9 +33,6 @@ namespace SpeechCast
                 case Response.BBSStyle.jbbs:
                     m = JBBSRegex.Match(ThreadURL);
                     break;
-                case Response.BBSStyle.yykakiko:
-                    m = YYRegex.Match(ThreadURL);
-                    break;
                 case Response.BBSStyle.nichan:
                     m = NichanRegex.Match(ThreadURL);
                     break;
@@ -52,9 +47,6 @@ namespace SpeechCast
             {
                 case Response.BBSStyle.jbbs:
                     m = JBBSBaseRegex.Match(BaseURL);
-                    break;
-                case Response.BBSStyle.yykakiko:
-                    m = YYBaseRegex.Match(BaseURL);
                     break;
                 case Response.BBSStyle.nichan:
                     m = NichanBaseRegex.Match(BaseURL);
@@ -72,7 +64,6 @@ namespace SpeechCast
                 case Response.BBSStyle.jbbs:
                     encodingName = "EUC-JP";
                     break;
-                case Response.BBSStyle.yykakiko:
                 case Response.BBSStyle.nichan:
                     encodingName = "Shift_JIS";
                     break;
@@ -194,7 +185,6 @@ namespace SpeechCast
 
                             break;
                         }
-                    case Response.BBSStyle.yykakiko:
                     case Response.BBSStyle.nichan:
                         {
                             url = string.Format("{0}/test/bbs.cgi", m.Groups[1].Value);
@@ -352,18 +342,9 @@ namespace SpeechCast
             if (m.Success)
             {
                 ThreadURL = string.Format("{0}/bbs/read.cgi/{1}/{2}/{3}/"
-                    , m.Groups[1].Value
-                    , m.Groups[2].Value
-                    , m.Groups[3].Value
-                    , ThreadID);
-                return ThreadURL;
-            }
-            m = Communicator.YYBaseRegex.Match(baseURL);
-            if (m.Success)
-            {
-                ThreadURL = string.Format("{0}/test/read.cgi/{1}/{2}/"
-                    , m.Groups[1].Value
-                    , m.Groups[2].Value
+                    , m.Groups["baseURL"].Value
+                    , m.Groups["category"].Value
+                    , m.Groups["board"].Value
                     , ThreadID);
                 return ThreadURL;
             }
@@ -371,8 +352,8 @@ namespace SpeechCast
             if (m.Success)
             {
                 ThreadURL = string.Format("{0}/test/read.cgi/{1}/{2}/"
-                    , m.Groups[1].Value
-                    , m.Groups[2].Value
+                    , m.Groups["baseURL"].Value
+                    , m.Groups["board"].Value
                     , ThreadID);
                 return ThreadURL;
             }

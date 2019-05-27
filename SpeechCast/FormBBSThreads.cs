@@ -49,7 +49,6 @@ namespace SpeechCast
                 case Response.BBSStyle.jbbs:
                     encodingName = "EUC-JP";
                     break;
-                case Response.BBSStyle.yykakiko:
                 case Response.BBSStyle.nichan:
                     encodingName = "Shift_JIS";
                     break;
@@ -154,15 +153,6 @@ namespace SpeechCast
                         return true;
                     }
                     m = Communicator.NichanBaseRegex.Match(BaseURL);
-                    if (m.Success)
-                    {
-                        ThreadURL = string.Format("{0}/test/read.cgi/{1}/{2}/"
-                            , m.Groups[1].Value
-                            , m.Groups[2].Value
-                            , thread.ThreadID);
-                        return true;
-                    }
-                    m = Communicator.YYBaseRegex.Match(BaseURL);
                     if (m.Success)
                     {
                         ThreadURL = string.Format("{0}/test/read.cgi/{1}/{2}/"

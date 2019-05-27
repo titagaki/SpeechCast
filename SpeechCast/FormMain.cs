@@ -295,39 +295,25 @@ namespace SpeechCast
         }
 
 
-        Regex jbbsBaseRegex = new System.Text.RegularExpressions.Regex(@"(http://(jbbs.livedoor.jp|jbbs.shitaraba.net)/\w+/\d+/)");
-        Regex nichanBaseRegex = new System.Text.RegularExpressions.Regex(@"(http://.+2ch\.net/\w+/)\s*$");
-        Regex yyBaseRegex = new System.Text.RegularExpressions.Regex(@"(http://(yy.+\.60\.kg|yy.+\.kakiko\.com|bbs\.aristocratism\.info|www.+\.atchs\.jp)/\w+/$)");
+        Regex jbbsBaseRegex = new System.Text.RegularExpressions.Regex(@"(https?://jbbs\.(livedoor\.jp|shitaraba\.net)/\w+/\d+/)");
+        Regex nichanBaseRegex = new System.Text.RegularExpressions.Regex(@"(https?://.+\.[25]ch\.net/\w+/)\s*$");
 
         private bool CheckBaseURL()
         {
             Match m = jbbsBaseRegex.Match(toolStripTextBoxURL.Text);
-
             if (m.Success)
             {
                 baseURL = m.Groups[1].Value;
                 Response.Style = Response.BBSStyle.jbbs;
                 return true;
             }
-            else
+
+            m = nichanBaseRegex.Match(toolStripTextBoxURL.Text);
+            if (m.Success)
             {
-                m = nichanBaseRegex.Match(toolStripTextBoxURL.Text);
-                if (m.Success)
-                {
-                    baseURL = m.Groups[1].Value;
-                    Response.Style = Response.BBSStyle.nichan;
-                    return true;
-                }
-                else
-                {
-                    m = yyBaseRegex.Match(toolStripTextBoxURL.Text);
-                    if (m.Success)
-                    {
-                        baseURL = m.Groups[1].Value;
-                        Response.Style = Response.BBSStyle.yykakiko;
-                        return true;
-                    }
-                }
+                baseURL = m.Groups[1].Value;
+                Response.Style = Response.BBSStyle.nichan;
+                return true;
             }
             return false;
         }
@@ -360,7 +346,6 @@ namespace SpeechCast
                         url = string.Format("{0}{1}-", rawURL, responses.Count + 1);
                         clearItems = false;
                         break;
-                    case Response.BBSStyle.yykakiko:
                     case Response.BBSStyle.nichan:
                         url = rawURL;
                         clearItems = false;
@@ -377,45 +362,30 @@ namespace SpeechCast
                 Match m = Communicator.JBBSRegex.Match(toolStripTextBoxURL.Text);
                 if (m.Success)
                 {
-                    rawURL = m.Groups[1].Value + "/bbs/rawmode.cgi" + m.Groups[2];
-                    threadId = m.Groups[5].Value;
+                    rawURL = m.Groups["baseURL"].Value + "/bbs/rawmode.cgi" + m.Groups["pathinfo"];
+                    threadId = m.Groups["thread"].Value;
                     AddLog("jbbs rawmode: {0} {1}", rawURL, threadId);
                     Response.Style = Response.BBSStyle.jbbs;
                     encodingName = "EUC-JP";
 
-                    baseURL = string.Format("{0}/{1}/{2}/", m.Groups[1], m.Groups[3], m.Groups[4]);
+                    baseURL = string.Format("{0}/{1}/{2}/", m.Groups["baseURL"], m.Groups["category"], m.Groups["board"]);
                 }
                 else
                 {
-                    m = Communicator.YYRegex.Match(toolStripTextBoxURL.Text);
+                    m = Communicator.NichanRegex.Match(toolStripTextBoxURL.Text);
                     if (m.Success)
                     {
-                        rawURL = m.Groups[1].Value + "/" + m.Groups[2].Value + "/dat/" + m.Groups[3].Value + ".dat";
-                        threadId = m.Groups[3].Value;
-                        Response.Style = Response.BBSStyle.yykakiko;
+                        rawURL = m.Groups["baseURL"].Value + "/" + m.Groups["board"].Value + "/dat/" + m.Groups[3].Value + ".dat";
+                        threadId = m.Groups["thread"].Value;
+                        Response.Style = Response.BBSStyle.nichan;
 
-                        AddLog("yykakiko dat mode: {0} {1}", rawURL , threadId);
+                        AddLog("2ch dat mode: {0} {1}", rawURL , threadId);
 
                         encodingName = "Shift_JIS";
-                        baseURL = string.Format("{0}/{1}/", m.Groups[1], m.Groups[2]);
-                    }
-                    else
-                    {
-                        m = Communicator.NichanRegex.Match(toolStripTextBoxURL.Text);
-                        if (m.Success)
-                        {
-                            rawURL = m.Groups[1].Value + "/" + m.Groups[2].Value + "/dat/" + m.Groups[3].Value + ".dat";
-                            threadId = m.Groups[3].Value;
-                            Response.Style = Response.BBSStyle.nichan;
-
-                            AddLog("2ch dat mode: {0} {1}", rawURL , threadId);
-
-                            encodingName = "Shift_JIS";
-                            baseURL = string.Format("{0}/{1}/", m.Groups[1], m.Groups[2]);
+                        baseURL = string.Format("{0}/{1}/", m.Groups["baseURL"], m.Groups["board"]);
 #if DEBUG
-                            debugDatFileName = m.Groups[3].Value + ".dat";
+                        debugDatFileName = m.Groups["thread"].Value + ".dat";
 #endif
-                        }
                     }
                 }
 
@@ -2120,7 +2090,6 @@ namespace SpeechCast
                         case Response.BBSStyle.jbbs:
                             encodingName = "EUC-JP";
                             break;
-                        case Response.BBSStyle.yykakiko:
                         case Response.BBSStyle.nichan:
                             encodingName = "Shift_JIS";
                             break;

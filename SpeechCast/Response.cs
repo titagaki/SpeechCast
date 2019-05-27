@@ -31,7 +31,6 @@ namespace SpeechCast
                 {
                     case BBSStyle.jbbs:
                         return 1000;
-                    case BBSStyle.yykakiko:
                     case BBSStyle.nichan:
                         return 1001;
                 }
@@ -49,10 +48,6 @@ namespace SpeechCast
             /// jbbs(したらば)形式
             /// </summary>
             jbbs,
-            /// <summary>
-            /// yyかきこ形式
-            /// </summary>
-            yykakiko,
             /// <summary>
             /// 2ch形式
             /// </summary>
@@ -100,7 +95,6 @@ namespace SpeechCast
                     }
 
                     break;
-                case BBSStyle.yykakiko:
                 case BBSStyle.nichan:
                     {
                         string[] values = rawText.Split(delimStrings, StringSplitOptions.None);
