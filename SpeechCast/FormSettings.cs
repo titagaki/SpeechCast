@@ -447,16 +447,18 @@ namespace SpeechCast
 
         private void buttonVoiceTest_Click(object sender, EventArgs e)
         {
-            FormMain.Instance.synthesizer.Volume = this.VoiceVolme;
-            FormMain.Instance.synthesizer.Rate = TrackBarSpeakingRate.Value;
-            FormMain.Instance.synthesizer.SpeakAsync(textTestSentence.Text);
+            var speaker = Speaker.Instance;
+            speaker.Volume = VoiceVolme;
+            speaker.Rate = TrackBarSpeakingRate.Value;
+            speaker.SpeakAsync(textTestSentence.Text);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            FormMain.Instance.synthesizer.Volume = this.VoiceVolme;
-            FormMain.Instance.synthesizer.Rate = TrackBarTurboSpeakingRate.Value;
-            FormMain.Instance.synthesizer.SpeakAsync(textTestSentence.Text);
+            var speaker = Speaker.Instance;
+            speaker.Volume = VoiceVolme;
+            speaker.Rate = TrackBarTurboSpeakingRate.Value;
+            speaker.SpeakAsync(textTestSentence.Text);
         }
 
         private void buttonNewResponseSoundFilePathesAdd_Click(object sender, EventArgs e)

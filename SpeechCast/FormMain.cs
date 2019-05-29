@@ -48,15 +48,17 @@ namespace SpeechCast
             // コンポーネントの初期化
             InitializeComponent();
 
+            var speaker = Speaker.Instance;
+
             // インストール済みSSAPI5のボイスリストを取得
-            foreach (InstalledVoice voice in synthesizer.GetInstalledVoices())
+            foreach (var voiceName in speaker.GetInstalledVoiceNames())
             {
-                toolStripComboBoxSelectVoice.Items.Add(voice.VoiceInfo.Name);
+                toolStripComboBoxSelectVoice.Items.Add(voiceName);
             }
 
             // 音声再生関連のコールバック関数の登録
-            synthesizer.SpeakProgress += new EventHandler<SpeakProgressEventArgs>(synthesizer_SpeakProgress);
-            synthesizer.SpeakCompleted += new EventHandler<SpeakCompletedEventArgs>(synthesizer_SpeakCompleted);
+            speaker.Synthesizer.SpeakProgress += new EventHandler<SpeakProgressEventArgs>(synthesizer_SpeakProgress);
+            speaker.Synthesizer.SpeakCompleted += new EventHandler<SpeakCompletedEventArgs>(synthesizer_SpeakCompleted);
 
             // 生成されたインスタンスを変数へ代入(別フォームからの操作のため)
             Instance = this;
@@ -210,8 +212,6 @@ namespace SpeechCast
             FormCaption.Instance.CaptionText = speackStr;
         }
 
-        public SpeechSynthesizer synthesizer = new SpeechSynthesizer();
-
         private void toolStripComboBoxSelectVoice_SelectedIndexChanged(object sender, EventArgs e)
         {
             int idx = toolStripComboBoxSelectVoice.SelectedIndex;
@@ -219,7 +219,7 @@ namespace SpeechCast
             if (idx >= 0)
             {
                 string voiceName = toolStripComboBoxSelectVoice.Items[idx].ToString();
-                synthesizer.SelectVoice(voiceName);
+                Speaker.Instance.SelectVoice(voiceName);
                 UserConfig.VoiceName = voiceName;
             }
         }
@@ -1040,9 +1040,11 @@ namespace SpeechCast
                 replacementIndices = null;
                 isSpeakingWarningMessage = true;
                 FormCaption.Instance.IsAAMode = false;
-                synthesizer.Rate = UserConfig.SpeakingRate;
+
+                var speaker = Speaker.Instance;
+                speaker.Rate = UserConfig.SpeakingRate;
                 isSpeaking = true;
-                synthesizer.SpeakAsync(speakingText);
+                speaker.SpeakAsync(speakingText);
             }
             else if (CurrentResNumber > Response.MaxResponseCount && openNextThread == ReadThread)
             {
@@ -1051,9 +1053,11 @@ namespace SpeechCast
                 replacementIndices = null;
                 isSpeakingWarningMessage = true;
                 FormCaption.Instance.IsAAMode = false;
-                synthesizer.Rate = UserConfig.SpeakingRate;
+
+                var speaker = Speaker.Instance;
+                speaker.Rate = UserConfig.SpeakingRate;
                 isSpeaking = true;
-                synthesizer.SpeakAsync(speakingText);
+                speaker.SpeakAsync(speakingText);
             }
             else
             {
@@ -1141,24 +1145,25 @@ namespace SpeechCast
                 }
             }
 
+            var speaker = Speaker.Instance;
             FormCaption.Instance.IsAAMode = isAAMode;
             FormCaption.Instance.CaptionText = "";
             if ((responses.Count - CurrentResNumber) < UserConfig.TurboThreshold || UserConfig.TurboMode == false)
             {
-                synthesizer.Rate = UserConfig.SpeakingRate;
+                speaker.Rate = UserConfig.SpeakingRate;
             }
             else
             {
-                synthesizer.Rate = UserConfig.TurboSpeakingRate;
+                speaker.Rate = UserConfig.TurboSpeakingRate;
             }
             if (UserConfig.SpeakMode)
             {
-                synthesizer.Volume = UserConfig.SpeakingVolume;
+                speaker.Volume = UserConfig.SpeakingVolume;
             }else{
-                synthesizer.Volume = 0;
+                speaker.Volume = 0;
             }
             if (CurrentResNumber == NewResponseNumber) PlaySoundNewResponse();
-            synthesizer.SpeakAsync(MMFrame.Text.Language.Japanese.ToKatakanaFromKatakanaHalf(pronounciationText));
+            speaker.SpeakAsync(MMFrame.Text.Language.Japanese.ToKatakanaFromKatakanaHalf(pronounciationText));
         }
 
         public void StopSpeaking()
@@ -1170,7 +1175,7 @@ namespace SpeechCast
         private void StopSpeakingCore()
         {
             FormCaption.Instance.CaptionText = "";
-            synthesizer.SpeakAsyncCancelAll();
+            Speaker.Instance.Synthesizer.SpeakAsyncCancelAll();
 
             this.Enabled = false; //UIをOFF
             try
@@ -1213,7 +1218,7 @@ namespace SpeechCast
             {
                 CurrentResNumber = res.Number;
 
-                if (synthesizer.State == SynthesizerState.Ready)
+                if (Speaker.Instance.State == SynthesizerState.Ready)
                 {
                     StartSpeaking();
                 }
@@ -1528,7 +1533,7 @@ namespace SpeechCast
 
             selectedIndex = 0;
             toolStripTrackBarVoiceVolume.Value = UserConfig.SpeakingVolume;
-            synthesizer.Volume = UserConfig.SpeakingVolume;
+            Speaker.Instance.Synthesizer.Volume = UserConfig.SpeakingVolume;
             myToolStripPlay.GripStyle = ToolStripGripStyle.Hidden;
             myToolStripUrl.GripStyle = ToolStripGripStyle.Hidden;
             myToolStripVoice.GripStyle = ToolStripGripStyle.Hidden;
@@ -1881,7 +1886,7 @@ namespace SpeechCast
         {
             UserConfig.SpeakingVolume = toolStripTrackBarVoiceVolume.Value;
             toolStripTextBoxVoiceVolume.Text = toolStripTrackBarVoiceVolume.Value.ToString();
-            synthesizer.Volume = toolStripTrackBarVoiceVolume.Value;            
+            Speaker.Instance.Volume = toolStripTrackBarVoiceVolume.Value;
         }
 
         private void toolStripTextBoxVoiceVolume_TextChanged(object sender, EventArgs e)
@@ -1895,7 +1900,7 @@ namespace SpeechCast
                     {
                         UserConfig.SpeakingVolume = vol;
                         toolStripTrackBarVoiceVolume.Value = vol;
-                        synthesizer.Volume = toolStripTrackBarVoiceVolume.Value;
+                        Speaker.Instance.Volume = toolStripTrackBarVoiceVolume.Value;
                     }
                     else
                     {
