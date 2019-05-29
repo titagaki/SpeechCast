@@ -207,45 +207,19 @@ namespace SpeechCast
             content = toHtmlRegexUrl.Replace(content, toTextMatchEvalGroupResAnchor); //リンクをつける
             content = toHtmlRegexGtGt.Replace(content, toTextMatchEvalGroupAddLink); //レスアンカー
 
-            //string id = "ID:" + this.ID;
-
-            //string headerHtml = string.Format("<a name=\"res{0}\"</a><table border=0 bgcolor=\"#CCCCCC\"><tr><td><font color=\"#000000\">{0}: <a href=\"mailto:{1}\">{2}</a>: {3} {4} </font></td></tr></table>"
-            //    , this.Number
-            //    , this.MailAddress
-            //    , this.Name
-            //    , this.DateTime
-            //    , id);
-
-            StringBuilder sb = new StringBuilder();
-            sb.Append("<a name=\"res");
-            sb.Append(this.Number);
-            sb.Append("\"></a><table border=0 bgcolor=\"#CCCCCC\"><tr><td><font color=\"#000000\">");
-            sb.Append(this.Number);
-            sb.Append(": ");
-            if (this.MailAddress != "")
+            var sb = new StringBuilder();
+            sb.Append("<div style=\"margin: 0px 0px 16px 0px; line-height: 1.25em; font-family: 'MS UI Gothic';\">");
+            sb.AppendFormat("<div><a name=\"res{0}\"><span style=\"color: #0000ff;\">{0}</span></a> 名前：<span style=\"color:#228B22; font-weight: bold;\">{1}</span>[{2}] 投稿日：{3}",
+                Number, Name, MailAddress, DateTime);
+            if (ID != "")
             {
-                sb.Append("<a href=\"mailto:");
-                sb.Append(this.MailAddress);
-                sb.Append("\"><b>");
-                sb.Append(this.Name);
-                sb.Append("</b></a>: ");
+                sb.AppendFormat(" ID:{0}", ID);
             }
-            else
-            {
-                sb.Append("<b>");
-                sb.Append(this.Name);
-                sb.Append("</b>: ");
-            }
-            sb.Append(this.DateTime);
-            sb.Append(" ID:");
-            sb.Append(this.ID);
-            sb.Append("  </font></td></tr></table>");
+            sb.Append("</div>");
+            sb.AppendFormat("<div style=\"margin-left: 2em;\">{0}</div>", content);
+            sb.Append("</div>");
 
-            sb.Append("<blockquote>");
-            sb.Append(content);
-            sb.Append("</blockquote>");
-
-            string txt = sb.ToString();
+            var txt = sb.ToString();
             return txt;
         }
 
