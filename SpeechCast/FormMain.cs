@@ -296,7 +296,7 @@ namespace SpeechCast
 
 
         Regex jbbsBaseRegex = new System.Text.RegularExpressions.Regex(@"(https?://jbbs\.(livedoor\.jp|shitaraba\.net)/\w+/\d+/)");
-        Regex nichanBaseRegex = new System.Text.RegularExpressions.Regex(@"(https?://.+\.[25]ch\.net/\w+/)\s*$");
+        Regex nichanBaseRegex = new System.Text.RegularExpressions.Regex(@"(https?://[0-9a-zA-z\-\.]+(:\d+)?/\w+/)\s*$");
 
         private bool CheckBaseURL()
         {
@@ -375,7 +375,7 @@ namespace SpeechCast
                     m = Communicator.NichanRegex.Match(toolStripTextBoxURL.Text);
                     if (m.Success)
                     {
-                        rawURL = m.Groups["baseURL"].Value + "/" + m.Groups["board"].Value + "/dat/" + m.Groups[3].Value + ".dat";
+                        rawURL = m.Groups["baseURL"].Value + "/" + m.Groups["board"].Value + "/dat/" + m.Groups["thread"].Value + ".dat";
                         threadId = m.Groups["thread"].Value;
                         Response.Style = Response.BBSStyle.nichan;
 
