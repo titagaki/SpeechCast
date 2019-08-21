@@ -11,10 +11,10 @@ namespace SpeechCast
     class Communicator
     {
         public static Regex JBBSRegex = new System.Text.RegularExpressions.Regex(@"(?<baseURL>https?://jbbs\.(livedoor\.jp|shitaraba\.net))/bbs/read.cgi(?<pathinfo>/(?<category>\w+)/(?<board>\d+)/(?<thread>\d+)/)");
-        public static Regex NichanRegex = new System.Text.RegularExpressions.Regex(@"(?<baseURL>http://.+\.[25]ch\.net)/.+/read.cgi/(?<board>\w+)/(?<thread>\d+)/");
+        public static Regex NichanRegex = new System.Text.RegularExpressions.Regex(@"(?<baseURL>https?://[0-9a-zA-z\-\.]+(:\d+)?)/.+/read.cgi/(?<board>\w+)/(?<thread>\d+)/");
 
         public static Regex JBBSBaseRegex = new System.Text.RegularExpressions.Regex(@"(?<baseURL>https?://jbbs\.(livedoor\.jp|shitaraba\.net))/(?<category>\w+)/(?<board>\d+)/");
-        public static Regex NichanBaseRegex = new System.Text.RegularExpressions.Regex(@"(?<baseURL>https?://.+\.[25]ch\.net)/(?<board>\w+)/");
+        public static Regex NichanBaseRegex = new System.Text.RegularExpressions.Regex(@"(?<baseURL>https?://[0-9a-zA-z\-\.]+(:\d+)?)/(?<board>\w+)/");
 
         public static Regex htmlBodyRegex = new System.Text.RegularExpressions.Regex("<body.*?>(.*)</body>", RegexOptions.IgnoreCase);
 
